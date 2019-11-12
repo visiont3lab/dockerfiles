@@ -1,0 +1,43 @@
+#-------- Starter developing image
+
+FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+
+ENV PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}
+ENV LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
+# ------- Installation Web Server dependendencies
+
+RUN apt-get update && apt-get install -y \
+    git \
+    cmake \
+    vim \
+    net-tools  \
+    wget \
+    htop \
+    unzip \
+    libsm6  \
+    libxext6 \
+    libxrender-dev \
+    libgtk2.0-dev
+
+ENV HOME=/root
+
+# ------- Installation Python dependendencies
+
+RUN apt-get update && apt-get install -y python3-pip python3-dev libmysqlclient-dev
+
+RUN /bin/bash -c  "pip3 install numpy \
+                    scipy  \
+                    tornado \
+                    imutils \
+                    pyinotify \
+                    mysqlclient \
+                    pandas \
+                    matplotlib \
+                    scikit-learn \
+                    Pillow cython  \
+                    opencv-python \
+                    opencv-contrib-python"  
+			
+#------------------ TEXT RECOGNITION REQUIREMENTS 
+RUN /bin/bash -c  "pip3 install tensorflow-gpu==1.14"

@@ -1,0 +1,11 @@
+FROM nvcr.io/nvidia/l4t-base:r32.2
+# https://www.stereolabs.com/blog/ros-and-nvidia-jetson-nano
+
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+RUN apt update && apt install -y python-pip apt-utils vim ros-melodic-desktop \
+ros-melodic-laser-assembler ros-melodic-laser-geometry ros-melodic-rqt-controller-manager  \
+ros-melodic-ros-controllers ros-melodic-gazebo-ros ros-melodic-gazebo-ros-control \
+ros-melodic-robot-state-publisher ros-melodic-ros-comm ros-melodic-gazebo-plugins
+
+
