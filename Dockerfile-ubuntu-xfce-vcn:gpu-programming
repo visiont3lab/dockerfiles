@@ -1,0 +1,27 @@
+FROM visiont3lab/ubuntu-xfce-vnc:gpu-base
+
+MAINTAINER Manuel Rucci "ruccimanuel7@gmail.com"
+
+### Add all install scripts for further steps
+ADD ./scripts/ $INST_SCRIPTS/
+ADD ./scripts/setup/startup $STARTUPDIR
+RUN find $INST_SCRIPTS -name '*.sh' -exec chmod a+x {} +
+
+# -------- Place here the new scripts ------ #
+
+# Install vscode
+RUN $INST_SCRIPTS/lib/vscode.sh
+
+# Install python programming gpu tools
+RUN $INST_SCRIPTS/lib/python-gpu.sh
+
+# Install opencv gpu 
+RUN $INST_SCRIPTS/lib/opencv-gpu.sh
+
+# Install dlib gpu
+RUN $INST_SCRIPTS/lib/dlib-gpu.sh
+
+# ------------------------------------------ #
+
+ENTRYPOINT ["/dockerstartup/vnc_startup.sh"]
+CMD ["--wait"]

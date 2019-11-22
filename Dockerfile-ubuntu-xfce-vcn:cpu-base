@@ -1,0 +1,49 @@
+# Headless Ubuntu VNC Server docker Image 
+
+FROM ubuntu:18.04
+
+MAINTAINER Manuel Rucci "ruccimanuel7@gmail.com"
+
+## Setup VNC connection
+# VNC port:5901
+# noVNC webport, connect via http://IP:6901/?password=vncpassword
+ENV DISPLAY=:1 \
+    VNC_PORT=5901 \
+    NO_VNC_PORT=6901
+EXPOSE $VNC_PORT $NO_VNC_PORT
+
+### Envrionment config Variable 
+ENV HOME=/home \
+    TERM=xterm \
+    STARTUPDIR=/dockerstartup \
+    INST_SCRIPTS=/home/install \
+    NO_VNC_HOME=/home/noVNC \
+    DEBIAN_FRONTEND=noninteractive \
+    VNC_COL_DEPTH=24 \
+    VNC_RESOLUTION=1920x1080 \
+    VNC_PW=visionlab \
+    VNC_VIEW_ONLY=false
+WORKDIR $HOME
+
+### Add all install scripts for further steps
+ADD ./scripts/ $INST_SCRIPTS/
+RUN find $INST_SCRIPTS -name '*.sh' -exec chmod a+x {} +
+
+### Install some common tools (firefox and chromium)
+RUN $INST_SCRIPTS/setup/common.sh
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+
+### Install xvnc-server & noVNC - HTML5 based VNC viewer
+RUN $INST_SCRIPTS/setup/vnc.sh
+
+### Install xfce UI
+RUN $INST_SCRIPTS/setup/xfce_ui.sh
+ADD ./scripts/setup/desktop-ui/xfce/ $HOME/
+
+### configure startup
+RUN $INST_SCRIPTS/setup/libnss_wrapper.sh
+ADD ./scripts/setup/startup $STARTUPDIR
+#RUN $INST_SCRIPTS/setup/set_user_permission.sh $STARTUPDIR $HOME
+
+ENTRYPOINT ["/dockerstartup/vnc_startup.sh"]
+CMD ["--wait"]

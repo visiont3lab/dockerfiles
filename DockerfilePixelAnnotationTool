@@ -1,0 +1,40 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y \
+    git \
+    cmake \
+    vim \
+    net-tools  \
+    wget \
+    htop \
+    unzip \
+    libsm6  \
+    libxext6 \
+    libxrender-dev \
+    libgtk2.0-dev \
+    build-essential \
+    qt5-default
+
+ENV HOME=/root
+
+RUN cd /root && git clone https://github.com/opencv/opencv.git  && cd /root/opencv && \ 
+    git checkout master && mkdir -p /root/opencv/release && cd /root/opencv/release 
+
+RUN cd /root/opencv/release && cmake -DCMAKE_BUILD_TYPE=Release -DOPENCV_GENERATE_PKGCONFIG=ON -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_PNG=OFF -DBUILD_TIFF=OFF \
+        -DBUILD_TBB=OFF -DBUILD_JPEG=OFF -DBUILD_JASPER=OFF -DBUILD_ZLIB=OFF -DBUILD_EXAMPLES=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python2=ON \
+        -DBUILD_opencv_python3=ON -DWITH_V4L=ON -DWITH_OPENGL=ON -DWITH_OPENCL=OFF -DWITH_OPENMP=OFF -DWITH_FFMPEG=ON  \
+        -DWITH_GSTREAMER=OFF -DWITH_GSTREAMER_0_10=OFF -DWITH_CUDA=OFF -DWITH_NVCUVID=OFF -DWITH_GTK=ON -DWITH_VTK=OFF \
+        -DWITH_TBB=ON -DWITH_1394=OFF -DWITH_OPENEXR=OFF -DINSTALL_C_EXAMPLES=OFF -DINSTALL_TESTS=OFF -DINSTALL_PYTHON_EXAMPLES=OFF .. && make -j4
+
+#RUN cd /root/ && git clone https://github.com/abreheret/PixelAnnotationTool.git  && mkdir -p /root/PixelAnnotationTool/build && cd /root/PixelAnnotationTool/build && cmake .. && make 
+# You need to modify CMAKELIST pixel annotation tool (problem package config opencv)
+#set(OpenCV_DIR /root/opencv/release)
+#find_package( OpenCV REQUIRED PATHS ${DIR_OpenCV}/cmake)
+
+#xhost +local:docker && \
+#    docker run --rm  \
+#        -it --name pixel_annotation_tool  \
+#        --env="DISPLAY=$DISPLAY" --env="QT_X11_NO_MITSHM=1" \
+#        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw"  \
+#        visiont3lab/pixel-annotation-tool:x86 \
+#        /bin/bash -c "cd /root/PixelAnnotationTool/build && ./PixelAnnotationTool"
